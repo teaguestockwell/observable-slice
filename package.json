@@ -1,5 +1,6 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
+  "description": "An observable for global state that can be subscribed to with react hooks, or callbacks",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
