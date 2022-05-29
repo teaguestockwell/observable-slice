@@ -1,10 +1,26 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "sideEffects": false,
-  "repository": "https://github.com/teaguestockwell/observable-slice",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/teaguestockwell/observable-slice"
+  },
+  "bugs": {
+    "url": "https://github.com/teaguestockwell/observable-slice/issues"
+  },
+  "homepage": "https://github.com/teaguestockwell/observable-slice",
+  "keywords": [
+    "redux",
+    "zustand",
+    "jotai",
+    "rxjs",
+    "state",
+    "mobx",
+    "xstate"
+  ],
   "files": [
     "dist",
     "src"
