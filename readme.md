@@ -1,4 +1,4 @@
-[![license-shield]][license-url] [![linkedin-shield]][linkedin-url] ![size-url] ![size-url2]![npm-v]][npm-url]![gh-shield]][gh-url]
+[![license-shield]][license-url] [![linkedin-shield]][linkedin-url] ![size-url] ![size-url2] [![npm-v]][npm-url] [![gh-shield]][gh-url]
 
 [license-shield]: https://img.shields.io/github/license/teaguestockwell/observable-slice.svg
 [license-url]: https://github.com/teaguestockwell/observable-slice/blob/master/LICENSE
