@@ -38,7 +38,7 @@ Create an observable for global state that can be subscribed to with react hooks
 
 ## Getting Started
 
-To get a local copy up and running follow these simple steps, or see the [Code Sandbox]([Code Sandbox](https://codesandbox.io/s/observable-slice-sh6e33)
+To get a local copy up and running follow these simple steps, or see the [Code Sandbox](https://codesandbox.io/s/observable-slice-sh6e33)
 
 ```sh
 npm i observable-slice
