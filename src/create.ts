@@ -1,7 +1,7 @@
 import * as React from 'react';
 import produce, { Draft, freeze } from 'immer';
 import { JsonObject } from 'type-fest';
-import  debounce from 'lodash.debounce';
+import debounce from 'lodash.debounce';
 
 /**
  * https://github.com/teaguestockwell/observable-slice
@@ -80,15 +80,16 @@ export const create = <
         subscribers.delete(sub);
       };
     },
-    useSub: <T>(select: (state: State) => T, willUpdate?: (prev: T, next: T) => boolean) => {
+    useSub: <T>(
+      select: (state: State) => T,
+      willUpdate?: (prev: T, next: T) => boolean
+    ) => {
       const [selected, setSelected] = React.useState(() => select(state));
       React.useEffect(() => {
         const sub = () =>
           setSelected((prev: any) => {
             const next = select(state);
-            const update = willUpdate
-              ? willUpdate(prev, next)
-              : prev === next;
+            const update = willUpdate ? willUpdate(prev, next) : prev === next;
             return update ? prev : next;
           });
 
@@ -101,12 +102,13 @@ export const create = <
       }, []);
 
       return selected;
-    }
+    },
   };
 
   if (pubs) {
     Object.keys(pubs).forEach(k => {
-      res[k] = (payload: any) => res.pub((draft: any) =>pubs[k](draft, payload))
+      res[k] = (payload: any) =>
+        res.pub((draft: any) => pubs[k](draft, payload));
     });
   }
 
@@ -115,7 +117,7 @@ export const create = <
       res[k] = (arg: any) => {
         const { select, willUpdate } = subs[k](arg);
         return res.useSub(select, willUpdate);
-      }
+      };
     });
   }
 
@@ -149,7 +151,10 @@ export const create = <
     /**
      * Subscribe to the selected state of the slice using a react hook.
      */
-    useSub: <T>(select: (state: State) => T, willUpdate?: (prev: T, next: T) => boolean) => T;
+    useSub: <T>(
+      select: (state: State) => T,
+      willUpdate?: (prev: T, next: T) => boolean
+    ) => T;
   } & {
     [K in keyof Pubs]: (arg: Parameters<Pubs[K]>[1]) => void;
   } &
