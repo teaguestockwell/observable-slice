@@ -47,7 +47,7 @@ npm i observable-slice
 ## Create a slice of state
 
 ```tsx
-import { create } from '../dist';
+import { create } from 'observable-slice';
 
 const countSlice = create({
   initState: {
