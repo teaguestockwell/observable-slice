@@ -97,6 +97,7 @@ export const CountApp = () => {
 # Props
 
 ## create
+A function that creates a slice of state with the following props:
 
 |     name     |        type         | default |                                                                                                                  description                                                                                                                   |
 | :----------: | :-----------------: | :-----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -105,6 +106,15 @@ export const CountApp = () => {
 |     subs     |   {} \| undefined   |         |                                                                   The subscribers will be available as react hooks and must be used inside of a react functional component.                                                                    |
 | debounceWait | number \| undefined |   100   |                                                                                   The amount of milliseconds to wait before notifying the subscribers again.                                                                                   |
 
+## slice
+The observable returned from a create function
+|     name     |        type         | default |                                                                                                                  description                                                                                                                   |
+| :----------: | :-----------------: | :-----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| pub          |        fn           |         | Used to publish updates to subscribers by mutating the slice. This is an alternative way to mutate state. You may use slice.pub instead defining reducers inside of create.pubs. pub is also wrapped in immer's produce. All publishers may be used outside of the react.                       |
+| sub          |        fn           |         | Used to subscribe to updates from publishers. This is an alternative way to subscribe to state that can be used outside of a react.                                                                                                            |
+| useSub       |        fn           |         | A react hook that will cause re renders to its component when the selected portion of the slice (param0) changes based on the willUpdate fn (param1)                                                                                           |
+| $pub         |        fn           |         | Each entry defined in create.pubs will be available on the returned slice. If you would like to pass more than one arg to the reducer, you may put them into an object                                                                         |
+| $useSub      |        fn           |         | Each entry defined in create.subs will create a react hook that may be consumed to subscribe to the slice. These hooks may also accept one parameter. For example, the useTodo subscription may accept the id of the todo to subscribe to.     |
 ## Roadmap
 
 See the [open issues](https://github.com/tsappdevelopment/observable-slice/issues) for a list of proposed features (and known issues).
