@@ -80,45 +80,42 @@ export const create = <
         subscribers.delete(sub);
       };
     },
+    useSub: <T>(select: (state: State) => T, willUpdate?: (prev: T, next: T) => boolean) => {
+      const [selected, setSelected] = React.useState(() => select(state));
+      React.useEffect(() => {
+        const sub = () =>
+          setSelected((prev: any) => {
+            const next = select(state);
+            const update = willUpdate
+              ? willUpdate(prev, next)
+              : prev === next;
+            return update ? prev : next;
+          });
+
+        subscribers.add(sub);
+
+        return () => {
+          subscribers.delete(sub);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+
+      return selected;
+    }
   };
 
   if (pubs) {
     Object.keys(pubs).forEach(k => {
-      res[k] = (payload: any) => {
-        state = produce(state as any, (draft: any) =>
-          pubs[k](draft, payload)
-        ) as any;
-        notify();
-      };
+      res[k] = (payload: any) => res.pub((draft: any) =>pubs[k](draft, payload))
     });
   }
 
   if (subs) {
     Object.keys(subs).forEach(k => {
-      const useSub = (arg: any) => {
+      res[k] = (arg: any) => {
         const { select, willUpdate } = subs[k](arg);
-        const [selected, setSelected] = React.useState(() => select(state));
-        React.useEffect(() => {
-          const sub = () =>
-            setSelected((prev: any) => {
-              const next = select(state);
-              const update = willUpdate
-                ? willUpdate(prev, next)
-                : prev === next;
-              return update ? prev : next;
-            });
-
-          subscribers.add(sub);
-
-          return () => {
-            subscribers.delete(sub);
-          };
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, []);
-
-        return selected;
-      };
-      res[k] = useSub;
+        return res.useSub(select, willUpdate);
+      }
     });
   }
 
@@ -149,6 +146,10 @@ export const create = <
        */
       willUpdate?: (prev: T, next: T) => boolean
     ) => () => void;
+    /**
+     * Subscribe to the selected state of the slice using a react hook.
+     */
+    useSub: <T>(select: (state: State) => T, willUpdate?: (prev: T, next: T) => boolean) => T;
   } & {
     [K in keyof Pubs]: (arg: Parameters<Pubs[K]>[1]) => void;
   } &

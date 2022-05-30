@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { create } from '../dist'
+import { create } from '../.'
 
 const styles: Record<string, React.CSSProperties> = {
   todoRoot: {
@@ -112,9 +112,7 @@ const AddTodo = () => {
   return (
     <button
       onClick={() => {
-        for (let i = 0; i < 1000; i++) {
-          todoSlice.addTodo(undefined);
-        }
+        todoSlice.addTodo(undefined);
       }}
     >
       new

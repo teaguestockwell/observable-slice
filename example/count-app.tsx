@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { create } from '../dist'
+import { create } from '../.'
 
 const countSlice = create({
   initState: {
@@ -23,7 +23,12 @@ const countSlice = create({
 
 const CountSub = () => {
   const count = countSlice.useCount()
-  return <span>{count}</span>
+  return <span>static sub {count}</span>
+}
+
+const CountSub2 = () => {
+  const count = countSlice.useSub(s => s.count)
+  return <span>dynamic sub {count}</span>
 }
 
 const CountPub = () => {
@@ -32,13 +37,14 @@ const CountPub = () => {
 
 const CountSub5 = () => {
   const count5 = countSlice.useCount5()
-  return <span>{count5}</span>
+  return <span>static sub by 5 {count5}</span>
 }
 
 export const CountApp = () => {
-  return <>
+  return <div style={{display: 'flex', gap: 10}}>
     <CountSub />
-    <CountPub />
+    <CountSub2 />
     <CountSub5 />
-  </>
+    <CountPub />
+  </div>
 }
