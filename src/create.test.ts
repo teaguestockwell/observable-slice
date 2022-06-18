@@ -204,7 +204,7 @@ describe('create', () => {
     
     expect(result.current).toBe(0);
   })
-  it('does not notify subscribed hooks that have a willUpdate of false', () => {
+  it('does not notify subscribed hooks that have a will update of false', () => {
     const slice = create({
       initState: {
         counter: 0,
@@ -227,6 +227,66 @@ describe('create', () => {
       slice.increment(1)
     })
     
+    expect(result.current).toBe(0);
+  })
+  it('useSub has initial state', () => {
+    const slice = create({
+      initState: {
+        counter: 0
+      }
+    })
+
+    const { result } = renderHook(() => slice.useSub(s => s.counter))
+
+    expect(result.current).toBe(0);
+  })
+  it('useSub is notified', () => {
+    const slice = create({
+      initState: {
+        counter: 0
+      }
+    })
+    const { result } = renderHook(() => slice.useSub(s => s.counter))
+
+    act(() => {
+      slice.pub(s => {
+        s.counter += 1;
+      })
+    })
+
+    expect(result.current).toBe(1);
+  })
+  it('useSub is not notified when it is not selected', () => {
+    const slice = create({
+      initState: {
+        counter: 0,
+        counter2: 0
+      }
+    })
+    const { result } = renderHook(() => slice.useSub(s => s.counter2))
+
+    act(() => {
+      slice.pub(s => {
+        s.counter += 1;
+      })
+    })
+
+    expect(result.current).toBe(0);
+  })
+  it('useSub is not notified when will update is false', () => {
+    const slice = create({
+      initState: {
+        counter: 0,
+      }
+    })
+    const { result } = renderHook(() => slice.useSub(s => s.counter, () => false))
+
+    act(() => {
+      slice.pub(s => {
+        s.counter += 1;
+      })
+    })
+
     expect(result.current).toBe(0);
   })
 });
