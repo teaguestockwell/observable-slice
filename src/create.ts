@@ -51,7 +51,10 @@ export const create = <
   let state = freeze(initState, true);
   const subscribers = new Set<() => void>();
   const _notify = () => subscribers.forEach(s => s());
-  const notify = debounceWait && debounceWait > 0 ? debounce(_notify, debounceWait) : _notify;
+  const notify =
+    debounceWait && debounceWait > 0
+      ? debounce(_notify, debounceWait)
+      : _notify;
 
   const res: any = {
     get: () => state,
