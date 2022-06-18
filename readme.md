@@ -31,11 +31,6 @@
 
 Create an observable for global state that can be subscribed to with react hooks, or callbacks.
 
-## Built With
-
-- [TSdx](https://github.com/formium/tsdx)
-- [TypeScript](https://www.typescriptlang.org)
-
 ## Getting Started
 
 To get a local copy up and running follow these simple steps, or see the [Code Sandbox](https://codesandbox.io/s/observable-slice-sh6e33)
@@ -103,7 +98,7 @@ A function that creates a slice of state with the following props:
 | :----------: | :-----------------: | :-----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 |  initState   |        JSON         |         |                                                                                                  The uncontrolled initial state of the slice.                                                                                                  |
 |     pubs     |   {} \| undefined   |         | The publishers will mutate the slice then notify the subscribers. These reducers are wrapped in immer's produce: https://immerjs.github.io/immer/update-patterns. If a publisher needs more than one parameter, it may be passed as an object. |
-|     subs     |   {} \| undefined   |         |                                                                   The subscribers will be available as react hooks and must be used inside of a react functional component.                                                                    |
+|     useSubs  |   {} \| undefined   |         |                                                                   The subscribers will be available as react hooks and must be used inside of a react functional component.                                                                    |
 | debounceWait | number \| undefined |   100   |                                                                                   The amount of milliseconds to wait before notifying the subscribers again.                                                                                   |
 
 ## slice
