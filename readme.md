@@ -53,7 +53,7 @@ const countSlice = create({
       draft.count += by;
     },
   },
-  subs: {
+  useSubs: {
     useCount: () => ({
       select: s => s.count,
     }),
