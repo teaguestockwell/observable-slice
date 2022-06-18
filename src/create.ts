@@ -10,7 +10,7 @@ import debounce from 'lodash.debounce';
 export const create = <
   State extends JsonObject,
   Pubs extends Record<string, (state: Draft<State>, payload: any) => void>,
-  Subs extends Record<
+  UseSubs extends Record<
     string,
     (
       arg?: any
@@ -22,7 +22,7 @@ export const create = <
 >({
   initState,
   pubs,
-  subs,
+  useSubs,
   debounceWait = 100,
 }: {
   /**
@@ -42,7 +42,7 @@ export const create = <
    * slice.useTodo('1')
    *
    */
-  subs?: Subs;
+  useSubs?: UseSubs;
   /**
    * The amount of milliseconds to wait before notifying the subscribers again.
    */
@@ -51,7 +51,7 @@ export const create = <
   let state = freeze(initState, true);
   const subscribers = new Set<() => void>();
   const _notify = () => subscribers.forEach(s => s());
-  const notify = debounceWait ? debounce(_notify, debounceWait) : _notify;
+  const notify = debounceWait && debounceWait > 0 ? debounce(_notify, debounceWait) : _notify;
 
   const res: any = {
     get: () => state,
@@ -67,8 +67,8 @@ export const create = <
       let prev = select(state);
       const sub = () => {
         const next = select(state);
-        const equal = willUpdate ? willUpdate(prev, next) : prev === next;
-        if (!equal) {
+        const update = willUpdate ? willUpdate(prev, next) : prev !== next;
+        if (update) {
           cb(next);
           prev = next;
         }
@@ -89,8 +89,8 @@ export const create = <
         const sub = () =>
           setSelected((prev: any) => {
             const next = select(state);
-            const update = willUpdate ? willUpdate(prev, next) : prev === next;
-            return update ? prev : next;
+            const update = willUpdate ? willUpdate(prev, next) : prev !== next;
+            return update ? next : prev;
           });
 
         subscribers.add(sub);
@@ -112,10 +112,10 @@ export const create = <
     });
   }
 
-  if (subs) {
-    Object.keys(subs).forEach(k => {
+  if (useSubs) {
+    Object.keys(useSubs).forEach(k => {
       res[k] = (arg: any) => {
-        const { select, willUpdate } = subs[k](arg);
+        const { select, willUpdate } = useSubs[k](arg);
         return res.useSub(select, willUpdate);
       };
     });
@@ -130,7 +130,7 @@ export const create = <
      * This will mutate the slice then notify the subscribers.
      * The update function is wrapped in immer's produce: https://immerjs.github.io/immer/update-patterns
      */
-    pub: (state: Draft<State>) => void;
+    pub: (update: (state: Draft<State>) => State | void) => void;
     /**
      * Subscribe to the selected state of the slice.
      */
@@ -159,8 +159,8 @@ export const create = <
     [K in keyof Pubs]: (arg: Parameters<Pubs[K]>[1]) => void;
   } &
     {
-      [K in keyof Subs]: (
-        ...arg: Parameters<Subs[K]>
-      ) => ReturnType<ReturnType<Subs[K]>['select']>;
+      [K in keyof UseSubs]: (
+        ...arg: Parameters<UseSubs[K]>
+      ) => ReturnType<ReturnType<UseSubs[K]>['select']>;
     };
 };
