@@ -1,29 +1,26 @@
 import * as React from 'react';
-import produce, { Draft, freeze } from 'immer';
-import { JsonObject } from 'type-fest';
-import debounce from 'lodash.debounce';
 
 /**
  * https://github.com/teaguestockwell/observable-slice
  * @returns A slice of state that can be observed with react hooks, or callbacks.
  */
 export const create = <
-  State extends JsonObject,
-  Pubs extends Record<string, (state: Draft<State>, payload: any) => void>,
+  State,
+  Pubs extends Record<string, (state: State, payload: any) => State>,
   UseSubs extends Record<
     string,
     (
       arg?: any
     ) => {
       select: (state: State) => unknown;
-      willUpdate?: (prev: any, next: any) => boolean;
+      willNotify?: (prev: any, next: any) => boolean;
     }
   >
 >({
   initState,
   pubs,
   useSubs,
-  debounceWait = 100,
+  notifyMiddleware,
 }: {
   /**
    * The uncontrolled initial state of the slice.
@@ -31,8 +28,8 @@ export const create = <
    */
   initState: State;
   /**
-   * The publishers will mutate the slice then notify the subscribers.
-   * These reducers are wrapped in immer's produce: https://immerjs.github.io/immer/update-patterns
+   * The publishers will replace the slice then notify the subscribers.
+   *  It is recommended to wrap these reducers in immer's produce: https://immerjs.github.io/immer/update-patterns
    * If a publisher needs more than one parameter, it may be passed as an object.
    */
   pubs?: Pubs;
@@ -44,33 +41,30 @@ export const create = <
    */
   useSubs?: UseSubs;
   /**
-   * The amount of milliseconds to wait before notifying the subscribers again.
+   * You may choose to debounce subscriber notification.
    */
-  debounceWait?: number;
+  notifyMiddleware?: (notify: () => void) => () => void;
 }) => {
-  let state = freeze(initState, true);
+  let state = initState;
   const subscribers = new Set<() => void>();
   const _notify = () => subscribers.forEach(s => s());
-  const notify =
-    debounceWait && debounceWait > 0
-      ? debounce(_notify, debounceWait)
-      : _notify;
+  const notify = notifyMiddleware ? notifyMiddleware(_notify) : _notify;
 
   const res: any = {
     get: () => state,
-    pub: (update: (state: Draft<State>) => void) => {
-      state = produce(state as any, update) as any;
+    pub: (replace: (state: State) => State) => {
+      state = replace(state);
       notify();
     },
     sub: <T>(
       select: (state: State) => T,
       cb: (arg: T) => void,
-      willUpdate?: (prev: T, next: T) => boolean
+      willNotify?: (prev: T, next: T) => boolean
     ) => {
       let prev = select(state);
       const sub = () => {
         const next = select(state);
-        const update = willUpdate ? willUpdate(prev, next) : prev !== next;
+        const update = willNotify ? willNotify(prev, next) : prev !== next;
         if (update) {
           cb(next);
           prev = next;
@@ -85,14 +79,14 @@ export const create = <
     },
     useSub: <T>(
       select: (state: State) => T,
-      willUpdate?: (prev: T, next: T) => boolean
+      willNotify?: (prev: T, next: T) => boolean
     ) => {
       const [selected, setSelected] = React.useState(() => select(state));
       React.useEffect(() => {
         const sub = () =>
           setSelected((prev: any) => {
             const next = select(state);
-            const update = willUpdate ? willUpdate(prev, next) : prev !== next;
+            const update = willNotify ? willNotify(prev, next) : prev !== next;
             return update ? next : prev;
           });
 
@@ -118,8 +112,8 @@ export const create = <
   if (useSubs) {
     Object.keys(useSubs).forEach(k => {
       res[k] = (arg: any) => {
-        const { select, willUpdate } = useSubs[k](arg);
-        return res.useSub(select, willUpdate);
+        const { select, willNotify } = useSubs[k](arg);
+        return res.useSub(select, willNotify);
       };
     });
   }
@@ -131,9 +125,9 @@ export const create = <
     get: () => State;
     /**
      * This will mutate the slice then notify the subscribers.
-     * The update function is wrapped in immer's produce: https://immerjs.github.io/immer/update-patterns
+     * It is recommended to wrap pubs in immer's produce: https://immerjs.github.io/immer/update-patterns
      */
-    pub: (update: (state: Draft<State>) => State | void) => void;
+    pub: (replace: (state: State) => State) => void;
     /**
      * Subscribe to the selected state of the slice.
      */
@@ -143,20 +137,20 @@ export const create = <
        */
       select: (state: State) => T,
       /**
-       * Called with the selected arg when willUpdate(previousSelected, nextSelected) is true.
+       * Called with the selected arg when willNotify(previousSelected, nextSelected) is true.
        */
       cb: (arg: T) => unknown,
       /**
        * A function that will be called to determine if this subscriber should be notified. By default this is a strict equality check.
        */
-      willUpdate?: (prev: T, next: T) => boolean
+      willNotify?: (prev: T, next: T) => boolean
     ) => () => void;
     /**
      * Subscribe to the selected state of the slice using a react hook.
      */
     useSub: <T>(
       select: (state: State) => T,
-      willUpdate?: (prev: T, next: T) => boolean
+      willNotify?: (prev: T, next: T) => boolean
     ) => T;
   } & {
     [K in keyof Pubs]: (arg: Parameters<Pubs[K]>[1]) => void;

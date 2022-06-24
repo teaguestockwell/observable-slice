@@ -1,5 +1,5 @@
 {
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "An observable for global state that can be subscribed to with react hooks, or callbacks",
   "license": "MIT",
   "main": "dist/index.js",
@@ -30,12 +30,10 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
+    "build": "microbundle --sourcemap false --tsconfig tsconfig.json",
     "test": "tsdx test --passWithNoTests",
     "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
+    "prepare": "yarn build",
     "analyze": "size-limit --why"
   },
   "peerDependencies": {
@@ -59,33 +57,15 @@
     "url": "https://teaguestockwell.com"
   },
   "module": "dist/observable-slice.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/observable-slice.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/observable-slice.esm.js",
-      "limit": "10 KB"
-    }
-  ],
+  "exports": "./dist/observable-slice.modern.mjs",
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^7.0.8",
     "@testing-library/react-hooks": "^8.0.1",
-    "@types/lodash.debounce": "^4.0.7",
     "@types/react": "^18.0.9",
-    "@types/react-dom": "^18.0.5",
     "husky": "^8.0.1",
+    "microbundle": "^0.15.0",
     "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "size-limit": "^7.0.8",
     "tsdx": "^0.14.1",
     "tslib": "^2.4.0",
     "typescript": "^4.7.2"
-  },
-  "dependencies": {
-    "immer": "^9.0.14",
-    "lodash.debounce": "^4.0.8",
-    "type-fest": "^2.13.0"
   }
 }

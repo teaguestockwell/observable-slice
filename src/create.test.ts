@@ -31,9 +31,9 @@ describe('create', () => {
         counter: 0,
       },
       pubs: {
-        increment: (state, payload) => {
-          state.counter += payload;
-        },
+        increment: (prev, by: number) => ({
+          counter: prev.counter + by,
+        }),
       },
     });
 
@@ -49,9 +49,9 @@ describe('create', () => {
         counter: 0,
       },
       pubs: {
-        increment: (state, payload) => {
-          state.counter += payload;
-        },
+        increment: (prev, by: number) => ({
+          counter: prev.counter + by,
+        }),
       },
     });
 
@@ -71,9 +71,9 @@ describe('create', () => {
         counter: 0,
       },
       pubs: {
-        increment: (state, payload) => {
-          state.counter += payload;
-        },
+        increment: (prev, by: number) => ({
+          counter: prev.counter + by,
+        }),
       },
     });
 
@@ -94,9 +94,10 @@ describe('create', () => {
         counter2: 0,
       },
       pubs: {
-        increment: (state, payload) => {
-          state.counter += payload;
-        },
+        increment: (prev, by: number) => ({
+          ...prev,
+          counter: prev.counter + by,
+        }),
       },
     });
 
@@ -116,9 +117,9 @@ describe('create', () => {
         counter: 0,
       },
       pubs: {
-        increment: (state, payload) => {
-          state.counter += payload;
-        },
+        increment: (prev, by: number) => ({
+          counter: prev.counter + by,
+        }),
       },
     });
 
@@ -140,10 +141,7 @@ describe('create', () => {
       },
     });
 
-    slice.pub(s => {
-      s.counter += 1;
-    });
-    expect(slice.get().counter).toBe(1);
+    slice.pub(p => ({ counter: p.counter + 1 }));
 
     slice.pub(s => {
       return {
@@ -174,9 +172,9 @@ describe('create', () => {
         counter: 0,
       },
       pubs: {
-        increment: (state, by: number) => {
-          state.counter += by;
-        },
+        increment: (prev, by: number) => ({
+          counter: prev.counter + by,
+        }),
       },
       useSubs: {
         useCount: () => ({
@@ -199,9 +197,10 @@ describe('create', () => {
         counter2: 0,
       },
       pubs: {
-        increment: (state, by: number) => {
-          state.counter2 += by;
-        },
+        increment: (prev, by: number) => ({
+          ...prev,
+          counter2: prev.counter2 + by,
+        }),
       },
       useSubs: {
         useCount: () => ({
@@ -223,14 +222,14 @@ describe('create', () => {
         counter: 0,
       },
       pubs: {
-        increment: (state, by: number) => {
-          state.counter += by;
-        },
+        increment: (prev, by: number) => ({
+          counter: prev.counter + by,
+        }),
       },
       useSubs: {
         useCount: () => ({
           select: s => s.counter,
-          willUpdate: () => false,
+          willNotify: () => false,
         }),
       },
     });
@@ -262,9 +261,7 @@ describe('create', () => {
     const { result } = renderHook(() => slice.useSub(s => s.counter));
 
     act(() => {
-      slice.pub(s => {
-        s.counter += 1;
-      });
+      slice.pub(p => ({ counter: p.counter + 1 }));
     });
 
     expect(result.current).toBe(1);
@@ -279,9 +276,7 @@ describe('create', () => {
     const { result } = renderHook(() => slice.useSub(s => s.counter2));
 
     act(() => {
-      slice.pub(s => {
-        s.counter += 1;
-      });
+      slice.pub(p => ({ ...p, counter: p.counter + 1 }));
     });
 
     expect(result.current).toBe(0);
@@ -300,11 +295,18 @@ describe('create', () => {
     );
 
     act(() => {
-      slice.pub(s => {
-        s.counter += 1;
-      });
+      slice.pub(p => ({ counter: p.counter + 1 }));
     });
 
     expect(result.current).toBe(0);
+  });
+  it('can use primitives as state', () => {
+    const slice = create({
+      initState: 0,
+    });
+
+    expect(slice.get()).toBe(0);
+    slice.pub(() => 1);
+    expect(slice.get()).toBe(1);
   });
 });
