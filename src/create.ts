@@ -21,6 +21,7 @@ export const create = <
   pubs,
   useSubs,
   notifyMiddleware,
+  onPub,
 }: {
   /**
    * The uncontrolled initial state of the slice.
@@ -44,6 +45,11 @@ export const create = <
    * You may choose to debounce subscriber notification.
    */
   notifyMiddleware?: (notify: () => void) => () => void;
+  /**
+   * Will be called with the new state each time an action is dispatched.
+   * This is useful for logging or persistance.
+   */
+  onPub?: (state: State) => void;
 }) => {
   let state = initState;
   const subscribers = new Set<() => void>();
@@ -55,6 +61,7 @@ export const create = <
     pub: (replace: (state: State) => State) => {
       state = replace(state);
       notify();
+      onPub?.(state)
     },
     sub: <T>(
       select: (state: State) => T,
@@ -124,7 +131,7 @@ export const create = <
      */
     get: () => State;
     /**
-     * This will mutate the slice then notify the subscribers.
+     * This will update the slice then notify the subscribers.
      * It is recommended to wrap pubs in immer's produce: https://immerjs.github.io/immer/update-patterns
      */
     pub: (replace: (state: State) => State) => void;

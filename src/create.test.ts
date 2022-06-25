@@ -309,4 +309,17 @@ describe('create', () => {
     slice.pub(() => 1);
     expect(slice.get()).toBe(1);
   });
+  it('runs side effects after actions are dispatched', () => {
+    const onPub = jest.fn();
+    const slice = create({
+      initState: 0,
+      onPub
+    })
+
+    slice.pub(() => 1)
+
+    expect(onPub).toHaveBeenCalledTimes(1)
+    expect(onPub).toHaveBeenCalledWith(1)
+    expect(slice.get()).toBe(1)
+  })
 });
