@@ -10,7 +10,7 @@ export const create = <
   UseSubs extends Record<
     string,
     (
-      arg?: any
+      arg: any
     ) => {
       select: (state: State) => unknown;
       willNotify?: (prev: any, next: any) => boolean;
@@ -175,7 +175,11 @@ export const create = <
       willNotify?: (prev: T, next: T) => boolean
     ) => T;
   } & {
-    [K in keyof Pubs]: (arg: Parameters<Pubs[K]>[1]) => void;
+    [K in keyof Pubs]: (
+      arg: Parameters<Pubs[K]>[1] extends undefined
+        ? void
+        : Parameters<Pubs[K]>[1]
+    ) => void;
   } &
     {
       [K in keyof UseSubs]: (

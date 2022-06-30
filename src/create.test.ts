@@ -332,4 +332,16 @@ describe('create', () => {
     rm();
     expect(logger).toHaveBeenCalledWith('rm-sub', 1);
   });
+  it('creates pubs that do not need args', () => {
+    const slice = create({
+      initState: false,
+      pubs: {
+        toggle: p => !p,
+      },
+    });
+
+    slice.toggle();
+
+    expect(slice.get()).toBe(true);
+  });
 });
