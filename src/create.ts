@@ -39,6 +39,7 @@ export const create = <
    * @example subs: { useTodo: (id: string) => ({ select: s => s.todos[id] }) }
    * slice.useTodo('1')
    *
+   * By default, all selectors will be memoized. If you would like to use a selector that is not memoized, try slice.useSub.
    */
   useSubs?: UseSubs;
   /**
@@ -95,9 +96,11 @@ export const create = <
     },
     useSub: <T>(
       select: (state: State) => T,
-      willNotify?: (prev: T, next: T) => boolean
+      willNotify?: (prev: T, next: T) => boolean,
+      selectorKey?: string
     ) => {
       const [selected, setSelected] = React.useState(() => select(state));
+      const unSubLast = React.useRef<() => void>();
       React.useEffect(() => {
         const sub = () =>
           setSelected((prev: any) => {
@@ -113,12 +116,18 @@ export const create = <
         log('add-sub', state);
         subscribers.add(sub);
 
-        return () => {
+        if (unSubLast.current) {
+          unSubLast.current();
+          sub();
+        }
+
+        unSubLast.current = () => {
           log('rm-sub', state);
           subscribers.delete(sub);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, []);
+        }
+
+        return unSubLast.current
+      }, [selectorKey]);
 
       return selected;
     },
@@ -169,10 +178,12 @@ export const create = <
     ) => () => void;
     /**
      * Subscribe to the selected state of the slice using a react hook.
+     * Selectors are memoized with selectorKey.
      */
     useSub: <T>(
       select: (state: State) => T,
-      willNotify?: (prev: T, next: T) => boolean
+      willNotify?: (prev: T, next: T) => boolean,
+      selectorKey?: string
     ) => T;
   } & {
     [K in keyof Pubs]: (

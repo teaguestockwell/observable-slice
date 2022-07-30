@@ -94,7 +94,7 @@ A function that creates a slice of state with the following props:
 | :----------: | :-----------------: | :-----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 |  initState   |        JSON         |         |                                                                                                  The uncontrolled initial state of the slice.                                                                                                  |
 |     pubs     |   {} \| undefined   |         | The publishers will replace the slice then notify the subscribers. It is recommended to wrap these reducers with immer's produce: https://immerjs.github.io/immer/update-patterns. If a publisher needs more than one parameter, it may be passed as an object. |
-|     useSubs  |   {} \| undefined   |         |                                                                   The subscribers will be available as react hooks and must be used inside of a react functional component.                                                                    |
+|     useSubs  |   {} \| undefined   |         | The subscribers will be available as react hooks and must be used inside of a react functional component. By default, all selectors will be memoized. If you would like to use a selector that is not memoized, try slice.useSub.               |
 | notifyMiddleware | (notify: () => void) => () => void  |      |                                                                                  You may add a debounce function here.                                                                                  |
 
 ## slice
@@ -105,7 +105,7 @@ The observable returned from a create function
 | sub          |        fn           |         | Used to subscribe to updates from publishers. This is an alternative way to subscribe to state that can be used outside of a react.                                                                                                            |
 | useSub       |        fn           |         | A react hook that will cause re renders to its component when the selected portion of the slice (param0) changes based on the willNotify fn (param1)                                                                                           |
 | $pub         |        fn           |         | Each entry defined in create.pubs will be available on the returned slice. If you would like to pass more than one arg to the reducer, you may put them into an object                                                                         |
-| $useSub      |        fn           |         | Each entry defined in create.subs will create a react hook that may be consumed to subscribe to the slice. These hooks may also accept one parameter. For example, the useTodo subscription may accept the id of the todo to subscribe to.     |
+| $useSub      |        fn           |         | Each entry defined in create.subs will create a react hook that may be consumed to subscribe to the slice. These hooks may also accept one parameter. For example, the useTodo subscription may accept the id of the todo to subscribe to. Selectors are memoized with selectorKey.  |
 | logger      |        fn           |         |  Add additionally functionality to the slice before it handles each eventFor example a logger, or a persister.    |
 ## Roadmap
 
