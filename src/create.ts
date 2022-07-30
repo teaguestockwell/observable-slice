@@ -124,9 +124,9 @@ export const create = <
         unSubLast.current = () => {
           log('rm-sub', state);
           subscribers.delete(sub);
-        }
+        };
 
-        return unSubLast.current
+        return unSubLast.current;
       }, [selectorKey]);
 
       return selected;
