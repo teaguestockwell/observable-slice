@@ -106,7 +106,6 @@ The observable returned from a create function
 | useSub       |        fn           |         | A react hook that will cause re renders to its component when the selected portion of the slice (param0) changes based on the isEqual fn (param1).                                                                                       |
 | $pub         |        fn           |         | Each entry defined in create.pubs will be available on the returned slice. If you would like to pass more than one arg to the reducer, you may put them into an object                                                                         |
 | $useSub      |        fn           |         | Each entry defined in create.subs will create a react hook that may be consumed to subscribe to the slice. These hooks may also accept one parameter. For example, the useTodo subscription may accept the id of the todo to subscribe to. |
-| logger      |        fn           |         |  Add additionally functionality to the slice before it handles each eventFor example a logger, or a persister.    |
 ## Roadmap
 
 See the [open issues](https://github.com/teaguestockwell/observable-slice/issues) for a list of proposed features (and known issues).

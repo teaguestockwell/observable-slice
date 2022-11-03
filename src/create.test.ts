@@ -309,29 +309,6 @@ describe('create', () => {
     slice.pub(() => 1);
     expect(slice.get()).toBe(1);
   });
-  it('runs side effects before internal events are handled', () => {
-    const logger = jest.fn();
-    const slice = create({
-      initState: 0,
-      logger,
-    });
-
-    slice.get();
-    expect(logger).toHaveBeenCalledWith('get', 0);
-
-    const rm = slice.sub(
-      s => s,
-      () => {}
-    );
-    expect(logger).toHaveBeenCalledWith('add-sub', 0);
-
-    slice.pub(() => 1);
-    expect(logger).toHaveBeenCalledWith('notify-subs', 1);
-    expect(logger).toHaveBeenCalledWith('notify-sub', 1);
-
-    rm();
-    expect(logger).toHaveBeenCalledWith('rm-sub', 1);
-  });
   it('creates pubs that do not need args', () => {
     const slice = create({
       initState: false,

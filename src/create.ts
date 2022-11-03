@@ -21,7 +21,6 @@ export const create = <
   pubs,
   useSubs,
   notifyMiddleware,
-  logger,
 }: {
   /**
    * The uncontrolled initial state of the slice.
@@ -46,28 +45,18 @@ export const create = <
    * You may choose to debounce subscriber notification.
    */
   notifyMiddleware?: (notify: () => void) => () => void;
-  /**
-   * Add additionally functionality to the slice before it handles each event. For example a logger.
-   */
-  logger?: (
-    name: 'get' | 'notify-subs' | 'add-sub' | 'rm-sub' | 'notify-sub',
-    state: State
-  ) => unknown;
 }) => {
   let state = initState;
   const subscribers = new Set<() => void>();
   const _notify = () => subscribers.forEach(s => s());
   const notify = notifyMiddleware ? notifyMiddleware(_notify) : _notify;
-  const log = logger ? logger : () => {};
 
   const res: any = {
     get: () => {
-      log('get', state);
       return state;
     },
     pub: (replace: (state: State) => State) => {
       state = replace(state);
-      log('notify-subs', state);
       notify();
     },
     sub: <T>(
@@ -80,17 +69,14 @@ export const create = <
         const next = select(state);
         const update = isEqual ? !isEqual(prev, next) : prev !== next;
         if (update) {
-          log('notify-sub', state);
           cb(next);
           prev = next;
         }
       };
 
-      log('add-sub', state);
       subscribers.add(sub);
 
       return () => {
-        log('rm-sub', state);
         subscribers.delete(sub);
       };
     },
