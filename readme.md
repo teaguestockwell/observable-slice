@@ -55,7 +55,7 @@ const countSlice = create({
     }),
     useCount5: () => ({
       select: s => s,
-      isEqual: (prev, next) => next % 5 === 0,
+      isEqual: (prev, next) => next % 5 !== 0,
     }),
   },
 });
