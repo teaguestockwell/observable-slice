@@ -111,7 +111,7 @@ describe('create', () => {
     slice.increment(1);
     expect(subbed).toBe(undefined);
   });
-  it('does not notify subscribers when will update is false', () => {
+  it('does not notify subscribers when is equal is true', () => {
     const slice = create({
       initState: {
         counter: 0,
@@ -127,7 +127,7 @@ describe('create', () => {
     slice.sub(
       s => s.counter,
       c => (subbed = c),
-      () => false
+      () => true
     );
 
     expect(subbed).toBe(undefined);
@@ -216,7 +216,7 @@ describe('create', () => {
 
     expect(result.current).toBe(0);
   });
-  it('does not notify subscribed hooks that have a will update of false', () => {
+  it('does not notify subscribed hooks that have a is equal of true', () => {
     const slice = create({
       initState: {
         counter: 0,
@@ -229,7 +229,7 @@ describe('create', () => {
       useSubs: {
         useCount: () => ({
           select: s => s.counter,
-          willNotify: () => false,
+          isEqual: () => true,
         }),
       },
     });
@@ -281,7 +281,7 @@ describe('create', () => {
 
     expect(result.current).toBe(0);
   });
-  it('useSub is not notified when will update is false', () => {
+  it('useSub is not notified when is equal is true', () => {
     const slice = create({
       initState: {
         counter: 0,
@@ -290,7 +290,7 @@ describe('create', () => {
     const { result } = renderHook(() =>
       slice.useSub(
         s => s.counter,
-        () => false
+        () => true
       )
     );
 

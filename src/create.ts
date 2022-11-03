@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/with-selector';
 
 /**
  * https://github.com/teaguestockwell/observable-slice
@@ -13,7 +13,7 @@ export const create = <
       arg: any
     ) => {
       select: (state: State) => unknown;
-      willNotify?: (prev: any, next: any) => boolean;
+      isEqual?: (prev: any, next: any) => boolean;
     }
   >
 >({
@@ -73,12 +73,12 @@ export const create = <
     sub: <T>(
       select: (state: State) => T,
       cb: (arg: T) => void,
-      willNotify?: (prev: T, next: T) => boolean
+      isEqual?: (prev: T, next: T) => boolean
     ) => {
       let prev = select(state);
       const sub = () => {
         const next = select(state);
-        const update = willNotify ? willNotify(prev, next) : prev !== next;
+        const update = isEqual ? !isEqual(prev, next) : prev !== next;
         if (update) {
           log('notify-sub', state);
           cb(next);
@@ -96,32 +96,15 @@ export const create = <
     },
     useSub: <T>(
       select: (state: State) => T,
-      willNotify?: (prev: T, next: T) => boolean,
-      selectorKey?: string
+      isEqual?: (prev: T, next: T) => boolean
     ) => {
-      const [selected, setSelected] = React.useState(() => select(state));
-      React.useEffect(() => {
-        const sub = () =>
-          setSelected((prev: any) => {
-            const next = select(state);
-            const update = willNotify ? willNotify(prev, next) : prev !== next;
-            if (update) {
-              log('notify-sub', state);
-              return next;
-            }
-            return prev;
-          });
-
-        log('add-sub', state);
-        subscribers.add(sub);
-
-        return () => {
-          log('rm-sub', state);
-          subscribers.delete(sub);
-        };
-      }, [selectorKey]);
-
-      return selected;
+      return useSyncExternalStoreWithSelector(
+        res.sub,
+        res.get,
+        undefined,
+        select,
+        isEqual
+      );
     },
   };
 
@@ -135,8 +118,8 @@ export const create = <
   if (useSubs) {
     Object.keys(useSubs).forEach(k => {
       res[k] = (arg: any) => {
-        const { select, willNotify } = useSubs[k](arg);
-        return res.useSub(select, willNotify);
+        const { select, isEqual } = useSubs[k](arg);
+        return res.useSub(select, isEqual);
       };
     });
   }
@@ -160,22 +143,20 @@ export const create = <
        */
       select: (state: State) => T,
       /**
-       * Called with the selected arg when willNotify(previousSelected, nextSelected) is true.
+       * Called with the selected arg when isEqual(previousSelected, nextSelected) is false.
        */
       cb: (arg: T) => unknown,
       /**
-       * A function that will be called to determine if this subscriber should be notified. By default this is a strict equality check.
+       * A function that will be called to determine if this subscriber should be notified (when isEqual(prev, next) === false). By default this is a strict equality check (===).
        */
-      willNotify?: (prev: T, next: T) => boolean
+      isEqual?: (prev: T, next: T) => boolean
     ) => () => void;
     /**
      * Subscribe to the selected state of the slice using a react hook.
-     * Selectors are memoized with selectorKey.
      */
     useSub: <T>(
       select: (state: State) => T,
-      willNotify?: (prev: T, next: T) => boolean,
-      selectorKey?: string
+      isEqual?: (prev: T, next: T) => boolean
     ) => T;
   } & {
     [K in keyof Pubs]: (
@@ -190,3 +171,5 @@ export const create = <
       ) => ReturnType<ReturnType<UseSubs[K]>['select']>;
     };
 };
+
+export default create;

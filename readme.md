@@ -55,7 +55,7 @@ const countSlice = create({
     }),
     useCount5: () => ({
       select: s => s,
-      willNotify: (prev, next) => next % 5 !== 0,
+      isEqual: (prev, next) => next % 5 === 0,
     }),
   },
 });
@@ -103,7 +103,7 @@ The observable returned from a create function
 | :----------: | :-----------------: | :-----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | pub          |        fn           |         | Used to publish updates to subscribers by mutating the slice. This is an alternative way to replace state. You may use slice.pub instead defining reducers inside of create.pubs. It iss also recommended to wrap pubs in immer's produce. All publishers may be used outside of the react.                       |
 | sub          |        fn           |         | Used to subscribe to updates from publishers. This is an alternative way to subscribe to state that can be used outside of a react.                                                                                                            |
-| useSub       |        fn           |         | A react hook that will cause re renders to its component when the selected portion of the slice (param0) changes based on the willNotify fn (param1). The selector (param0) is memoized using selectorKey (param2)                                                                                          |
+| useSub       |        fn           |         | A react hook that will cause re renders to its component when the selected portion of the slice (param0) changes based on the isEqual fn (param1).                                                                                       |
 | $pub         |        fn           |         | Each entry defined in create.pubs will be available on the returned slice. If you would like to pass more than one arg to the reducer, you may put them into an object                                                                         |
 | $useSub      |        fn           |         | Each entry defined in create.subs will create a react hook that may be consumed to subscribe to the slice. These hooks may also accept one parameter. For example, the useTodo subscription may accept the id of the todo to subscribe to. |
 | logger      |        fn           |         |  Add additionally functionality to the slice before it handles each eventFor example a logger, or a persister.    |
