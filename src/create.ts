@@ -100,7 +100,6 @@ export const create = <
       selectorKey?: string
     ) => {
       const [selected, setSelected] = React.useState(() => select(state));
-      const unSubLast = React.useRef<() => void>();
       React.useEffect(() => {
         const sub = () =>
           setSelected((prev: any) => {
@@ -116,17 +115,10 @@ export const create = <
         log('add-sub', state);
         subscribers.add(sub);
 
-        if (unSubLast.current) {
-          unSubLast.current();
-          sub();
-        }
-
-        unSubLast.current = () => {
+        return () => {
           log('rm-sub', state);
           subscribers.delete(sub);
         };
-
-        return unSubLast.current;
       }, [selectorKey]);
 
       return selected;
