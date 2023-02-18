@@ -1,6 +1,6 @@
 {
   "name": "observable-slice",
-  "version": "0.0.20-4",
+  "version": "0.0.21",
   "description": "An observable for global state that can be subscribed to with react hooks, or callbacks",
   "license": "MIT",
   "author": {
