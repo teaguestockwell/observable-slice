@@ -1,25 +1,28 @@
 {
   "name": "observable-slice",
-  "version": "0.0.20",
+  "version": "0.0.20-1",
   "description": "An observable for global state that can be subscribed to with react hooks, or callbacks",
   "license": "MIT",
-  "typings": "dist/index.d.ts",
-  "sideEffects": false,
-  "exports": {
-    "require": "./dist/index.cjs",
-    "default": "./dist/index.modern.js"
+  "author": {
+    "name": "Teague Stockwell",
+    "email": "tsappdevelopment@gmail.com",
+    "url": "https://teaguestockwell.com"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.module.js",
-  "unpkg": "./dist/index.umd.js",
+  "homepage": "https://github.com/teaguestockwell/observable-slice",
   "repository": {
     "type": "git",
     "url": "https://github.com/teaguestockwell/observable-slice"
   },
-  "bugs": {
-    "url": "https://github.com/teaguestockwell/observable-slice/issues"
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "source": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "umd:main": "./dist/index.umd.js",
+  "module": "./dist/index.module.js",
+  "exports": {
+    "require": "./dist/index.cjs",
+    "default": "./dist/index.modern.js"
   },
-  "homepage": "https://github.com/teaguestockwell/observable-slice",
   "keywords": [
     "redux",
     "zustand",
@@ -29,15 +32,8 @@
     "mobx",
     "xstate"
   ],
-  "files": [
-    "dist",
-    "src"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
-    "build": "microbundle --sourcemap false --tsconfig tsconfig.json --visualize --external react",
+    "build": "rm -rf ./dist && microbundle --sourcemap false --tsconfig tsconfig.json --visualize --external react --name observable-slice",
     "test": "tsdx test",
     "lint": "tsdx lint src",
     "prepare": "yarn build"
@@ -55,11 +51,6 @@
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5"
-  },
-  "author": {
-    "name": "Teague Stockwell",
-    "email": "tsappdevelopment@gmail.com",
-    "url": "https://teaguestockwell.com"
   },
   "devDependencies": {
     "@testing-library/react": "^13.3.0",
