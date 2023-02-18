@@ -1,6 +1,6 @@
 {
   "name": "observable-slice",
-  "version": "0.0.20-1",
+  "version": "0.0.20-2",
   "description": "An observable for global state that can be subscribed to with react hooks, or callbacks",
   "license": "MIT",
   "author": {
@@ -32,6 +32,13 @@
     "mobx",
     "xstate"
   ],
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
   "scripts": {
     "build": "rm -rf ./dist && microbundle --sourcemap false --tsconfig tsconfig.json --visualize --external react --name observable-slice",
     "test": "tsdx test",
